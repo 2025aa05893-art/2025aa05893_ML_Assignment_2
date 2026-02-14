@@ -3,29 +3,29 @@ import pandas as pd
 import pickle
 import os
 
-st.set_page_config(page_title="Adult Income Prediction", layout="wide")
+st.set_page_config(page_title="Adult Income Predictor")
 
 st.title("💰 Adult Income Prediction using ML Models")
 
-# -------------------- TRAIN MODEL ONLY IF NOT EXISTS --------------------
+# ================= TRAIN MODEL IF NOT EXISTS =================
 
 if not os.path.exists("model/saved_models.pkl"):
+
     st.warning("Training models for first time... Please wait 1-2 minutes ⏳")
-    import model.train_models
 
-# -------------------- LOAD MODELS --------------------
+    from model.train_models import *
 
-models = pickle.load(open("model/saved_models.pkl", "rb"))
-scaler = pickle.load(open("model/scaler.pkl", "rb"))
-columns = pickle.load(open("model/columns.pkl", "rb"))
+    st.success("Training Completed ✅")
 
-# -------------------- UI --------------------
+# ================= LOAD MODELS =================
 
-uploaded_file = st.file_uploader("Upload CSV File", type=["csv"])
+models = pickle.load(open("model/saved_models.pkl","rb"))
+scaler = pickle.load(open("model/scaler.pkl","rb"))
+columns = pickle.load(open("model/columns.pkl","rb"))
 
-model_name = st.selectbox("Select Model", list(models.keys()))
+# ================= FILE UPLOAD =================
 
-# -------------------- PREDICTION --------------------
+uploaded_file = st.file_uploader("Upload Adult CSV File", type=["csv"])
 
 if uploaded_file is not None:
 
@@ -34,50 +34,42 @@ if uploaded_file is not None:
     st.subheader("Uploaded Data")
     st.write(data.head())
 
-    # -------------------- HANDLE MISSING VALUES --------------------
-
+    # ---------- CLEAN DATA ----------
     data.replace(' ?', pd.NA, inplace=True)
     data.replace('?', pd.NA, inplace=True)
     data.fillna('Unknown', inplace=True)
 
-    # -------------------- ENCODING --------------------
-
+    # ---------- ONE HOT ----------
     data = pd.get_dummies(data)
 
-    # Add missing columns
+    # ---------- MATCH TRAINING COLUMNS ----------
     for col in columns:
         if col not in data.columns:
             data[col] = 0
 
-    # Remove extra columns
-    for col in data.columns:
-        if col not in columns:
-            data.drop(col, axis=1, inplace=True)
-
-    # Arrange in correct order
     data = data[columns]
 
-    # -------------------- SCALE --------------------
-
+    # ---------- SCALE ----------
     X = scaler.transform(data)
 
-    # -------------------- PREDICT --------------------
+    # ---------- PREDICT ----------
+    results = {}
 
-    model = models[model_name]
-    predictions = model.predict(X)
+    for name, model in models.items():
+        pred = model.predict(X)
+        results[name] = pred
 
-    data["Prediction"] = predictions
+    result_df = pd.DataFrame(results)
 
     st.subheader("Predictions")
-    st.write(data)
+    st.write(result_df)
 
-    # -------------------- DOWNLOAD OPTION --------------------
-
-    csv = data.to_csv(index=False).encode("utf-8")
+    # ---------- DOWNLOAD ----------
+    csv = result_df.to_csv(index=False).encode('utf-8')
 
     st.download_button(
-        label="Download Predictions as CSV",
+        label="Download Predictions CSV",
         data=csv,
-        file_name="predictions.csv",
-        mime="text/csv",
+        file_name='predictions.csv',
+        mime='text/csv'
     )
