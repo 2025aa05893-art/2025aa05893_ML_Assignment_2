@@ -3,7 +3,7 @@ import pandas as pd
 import pickle
 import os
 
-st.set_page_config(page_title="Adult Income Classification", layout="wide")
+st.set_page_config(page_title="Adult Income Prediction", layout="wide")
 
 st.title("💰 Adult Income Prediction using ML Models")
 
@@ -34,7 +34,8 @@ if uploaded_file is not None:
     st.subheader("Uploaded Data")
     st.write(data.head())
 
-    # One hot encoding
+    # -------------------- ENCODING --------------------
+
     data = pd.get_dummies(data)
 
     # Add missing columns
@@ -42,13 +43,20 @@ if uploaded_file is not None:
         if col not in data.columns:
             data[col] = 0
 
-    # Keep correct order
+    # Remove extra columns
+    for col in data.columns:
+        if col not in columns:
+            data.drop(col, axis=1, inplace=True)
+
+    # Arrange in correct order
     data = data[columns]
 
-    # Scale
+    # -------------------- SCALE --------------------
+
     X = scaler.transform(data)
 
-    # Predict
+    # -------------------- PREDICT --------------------
+
     model = models[model_name]
     predictions = model.predict(X)
 
