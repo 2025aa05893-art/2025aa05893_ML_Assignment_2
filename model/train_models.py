@@ -54,7 +54,9 @@ for name,model in models.items():
         matthews_corrcoef(y_test,y_pred)
     ]
 
-pickle.dump(models,open("saved_models.pkl","wb"))
-pickle.dump(scaler,open("scaler.pkl","wb"))
+pickle.dump(models, open("model/saved_models.pkl", "wb"))
+pickle.dump(scaler, open("model/scaler.pkl", "wb"))
+pickle.dump(X.columns, open("model/columns.pkl", "wb"))
+
 
 print(results)
