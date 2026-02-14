@@ -34,6 +34,12 @@ if uploaded_file is not None:
     st.subheader("Uploaded Data")
     st.write(data.head())
 
+    # -------------------- HANDLE MISSING VALUES --------------------
+
+    data.replace(' ?', pd.NA, inplace=True)
+    data.replace('?', pd.NA, inplace=True)
+    data.fillna('Unknown', inplace=True)
+
     # -------------------- ENCODING --------------------
 
     data = pd.get_dummies(data)
