@@ -11,7 +11,11 @@ import subprocess
 
 if not os.path.exists("model/saved_models.pkl"):
     st.warning("Training models... Please wait for 1-2 minutes ⏳")
-    subprocess.run(["python", "model/train_models.py"])
+
+    subprocess.run(
+        ["python", "model/train_models.py"],
+        cwd="."
+    )
 
 # ---------------- LOAD TRAINED MODELS ---------------- #
 
