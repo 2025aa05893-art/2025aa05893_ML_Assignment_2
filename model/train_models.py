@@ -15,15 +15,16 @@ df.columns = df.columns.str.strip()
 
 X = df.drop(df.columns[-1], axis=1)
 y = df[df.columns[-1]]
+
 y = y.str.strip()
 y = y.map({'<=50K':0,'>50K':1})
 
 X_train, X_test, y_train, y_test = train_test_split(X,y,test_size=0.2,random_state=42)
+
 X_train = pd.get_dummies(X_train)
 X_test = pd.get_dummies(X_test)
 
 X_train, X_test = X_train.align(X_test, join='left', axis=1, fill_value=0)
-
 
 scaler = StandardScaler()
 X_train = scaler.fit_transform(X_train)
@@ -35,7 +36,7 @@ models = {
 "KNN":KNeighborsClassifier(),
 "Naive Bayes":GaussianNB(),
 "Random Forest":RandomForestClassifier(),
-"XGBoost":XGBClassifier(eval_metric='mlogloss')
+"XGBoost":XGBClassifier(eval_metric='logloss')
 }
 
 results={}
@@ -46,9 +47,10 @@ for name,model in models.items():
 
     results[name]=[
         accuracy_score(y_test,y_pred),
-        precision_score(y_test,y_pred,average='weighted'),
-        recall_score(y_test,y_pred,average='weighted'),
-        f1_score(y_test,y_pred,average='weighted'),
+        roc_auc_score(y_test,y_pred),
+        precision_score(y_test,y_pred),
+        recall_score(y_test,y_pred),
+        f1_score(y_test,y_pred),
         matthews_corrcoef(y_test,y_pred)
     ]
 
