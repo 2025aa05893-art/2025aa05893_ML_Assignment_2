@@ -8,7 +8,7 @@ from xgboost import XGBClassifier
 from sklearn.metrics import accuracy_score
 import os
 
-df = pd.read_csv("adult.csv")
+df = pd.read_csv("model/data.csv")
 
 df.replace(' ?', pd.NA, inplace=True)
 df.replace('?', pd.NA, inplace=True)
