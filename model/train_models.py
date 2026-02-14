@@ -10,7 +10,7 @@ from sklearn.ensemble import RandomForestClassifier
 from xgboost import XGBClassifier
 import pickle
 
-df = pd.read_csv("data.csv")
+df = pd.read_csv("model/data.csv")
 df.columns = df.columns.str.strip()
 
 X = df.drop(df.columns[-1], axis=1)
