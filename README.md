@@ -1,6 +1,6 @@
 # 🧠 Machine Learning Assignment 2
 
-## 💰 Adult Income Prediction using Multiple ML Models
+## 💰 Adult Income Classification using Multiple ML Models
 
 ---
 
@@ -11,15 +11,15 @@ The objective of this project is to build a Machine Learning classification syst
 * **<=50K**
 * **>50K**
 
-based on demographic and employment-related attributes from the **Adult Income Dataset**.
+based on demographic and employment-related attributes from the Adult Income Dataset.
 
 ---
 
 ## 📂 Dataset Used
 
-**Adult Income Dataset** from the UCI Machine Learning Repository.
+Adult Income Dataset from the UCI Machine Learning Repository.
 
-This dataset contains various features such as:
+This dataset contains features such as:
 
 * Age
 * Workclass
@@ -69,7 +69,7 @@ The deployed Streamlit application includes:
 
 ✔ CSV Dataset Upload Option (Test Data Only)
 ✔ Model Selection Dropdown
-✔ Display of Evaluation Metrics
+✔ Evaluation Metrics Display
 ✔ Confusion Matrix Visualization
 ✔ Classification Report
 ✔ Predictions Table
@@ -77,9 +77,30 @@ The deployed Streamlit application includes:
 
 ---
 
-## 🖥️ How to Run the Application Locally
+## ❗ Important Note Regarding Model Files (.pkl)
 
-Follow the steps below:
+The trained model files such as:
+
+* `saved_models.pkl`
+* `scaler.pkl`
+
+are **NOT uploaded to GitHub** due to the file size limitations of the Streamlit Free Tier and GitHub.
+
+Instead:
+
+✔ The Streamlit application automatically trains the models during the **first deployment** in the cloud environment.
+✔ The trained `.pkl` files are then generated dynamically within the Streamlit Cloud runtime environment.
+✔ These files are reused in subsequent runs for prediction.
+
+This approach ensures:
+
+* Successful deployment on Streamlit Cloud
+* Compliance with GitHub file size limits
+* Smooth functioning of the application
+
+---
+
+## 🖥️ How to Run the Application Locally
 
 ### Step 1: Install Dependencies
 
@@ -101,41 +122,30 @@ streamlit run app.py
 2025aa05893_ML_Assignment_2
 │
 ├── model
-│   ├── train_models.py
-│   ├── saved_models.pkl
-│   └── scaler.pkl
+│   └── train_models.py
 │
 ├── app.py
 ├── requirements.txt
+├── runtime.txt
 └── README.md
 ```
 
 ---
 
-## 📈 Sample Model Performance
-
-| Model               | Accuracy | Precision | Recall | F1 Score | MCC  |
-| ------------------- | -------- | --------- | ------ | -------- | ---- |
-| Logistic Regression | 0.85     | 0.84      | 0.85   | 0.84     | 0.55 |
-| Decision Tree       | 0.81     | 0.81      | 0.81   | 0.80     | 0.47 |
-| KNN                 | 0.82     | 0.81      | 0.82   | 0.81     | 0.47 |
-| Naive Bayes         | 0.37     | 0.79      | 0.37   | 0.33     | 0.18 |
-| Random Forest       | 0.85     | 0.84      | 0.85   | 0.84     | 0.56 |
-| XGBoost             | 0.87     | 0.86      | 0.87   | 0.86     | 0.62 |
-
----
-
 ## 🌐 Deployment
 
-The Streamlit application is deployed using **Streamlit Cloud Platform**.
+The Streamlit application is deployed using Streamlit Cloud.
+
+🔗 Streamlit App Link:
+https://2025aa05893mlassignment2-jqokmz27sn5afuwruvrd8c.streamlit.app/
+
+🔗 GitHub Repository Link:
+https://github.com/2025aa05893-art/2025aa05893_ML_Assignment_2
 
 ---
 
 ## 📌 Conclusion
 
-Among all the implemented models, **Random Forest** and **XGBoost** provided the best classification performance for predicting income levels in the Adult Income dataset.
+Among all the implemented models, **Random Forest** and **XGBoost** provided the best performance for predicting income levels in the Adult Income dataset.
 
-
-
-Machine Learning Assignment Submission
-Adult Income Classification using Streamlit Deployment
+---
