@@ -7,14 +7,18 @@ import seaborn as sns
 import os
 import subprocess
 
-if not os.path.exists("model/saved_models.pkl"):
+# ---------------- AUTO TRAIN MODEL IF NOT PRESENT ---------------- #
 
-    import subprocess
+if not os.path.exists("model/saved_models.pkl"):
+    st.warning("Training models... Please wait for 1-2 minutes ⏳")
     subprocess.run(["python", "model/train_models.py"])
+
+# ---------------- LOAD TRAINED MODELS ---------------- #
 
 models = pickle.load(open("model/saved_models.pkl","rb"))
 scaler = pickle.load(open("model/scaler.pkl","rb"))
 
+# ---------------- STREAMLIT UI ---------------- #
 
 st.set_page_config(page_title="Income Classification App", layout="wide")
 
@@ -31,6 +35,8 @@ st.sidebar.write("0 → Income ≤ 50K")
 st.sidebar.write("1 → Income > 50K")
 
 uploaded_file = st.file_uploader("📂 Upload Test CSV (without income column)")
+
+# ---------------- PREDICTION BLOCK ---------------- #
 
 if uploaded_file is not None:
 
@@ -59,6 +65,8 @@ if uploaded_file is not None:
     result_df = pd.DataFrame(prediction, columns=["Predicted Income Class"])
     st.write(result_df)
 
+    # -------- DOWNLOAD CSV -------- #
+
     csv = result_df.to_csv(index=False).encode('utf-8')
 
     st.download_button(
@@ -68,7 +76,10 @@ if uploaded_file is not None:
         mime='text/csv'
     )
 
+    # -------- CONFUSION MATRIX -------- #
+
     if st.checkbox("Show Confusion Matrix"):
+
         y_true = st.number_input("Enter Actual Class (0 or 1)",0,1)
         cm = confusion_matrix([y_true]*len(prediction), prediction)
 
@@ -78,7 +89,10 @@ if uploaded_file is not None:
         ax.set_ylabel("Actual")
         st.pyplot(fig)
 
+    # -------- CLASSIFICATION REPORT -------- #
+
     if st.checkbox("Show Classification Report"):
+
         y_true = st.number_input("Enter Actual Class ",0,1)
         report = classification_report([y_true]*len(prediction), prediction, output_dict=True)
         report_df = pd.DataFrame(report).transpose()
