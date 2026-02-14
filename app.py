@@ -2,10 +2,12 @@ import streamlit as st
 import pandas as pd
 import pickle
 import os
-from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
-from sklearn.metrics import matthews_corrcoef, confusion_matrix, classification_report
+import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
+
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
+from sklearn.metrics import matthews_corrcoef, confusion_matrix, classification_report
 
 st.set_page_config(page_title="Adult Income Prediction", layout="wide")
 
@@ -23,7 +25,7 @@ if not os.path.exists("model/saved_models.pkl"):
 models = pickle.load(open("model/saved_models.pkl","rb"))
 scaler = pickle.load(open("model/scaler.pkl","rb"))
 
-# ================= UPLOAD CSV =================
+# ================= FILE UPLOAD =================
 
 uploaded_file = st.file_uploader("Upload Adult CSV File", type=["csv"])
 
@@ -32,14 +34,14 @@ if uploaded_file is not None:
     df = pd.read_csv(uploaded_file)
 
     st.subheader("Uploaded Data")
-    st.write(df.head())
+    st.dataframe(df.head(), use_container_width=True)
 
     # ================= HANDLE MISSING =================
 
     df.replace("?", pd.NA, inplace=True)
     df.dropna(inplace=True)
 
-    # ================= SEPARATE TARGET =================
+    # ================= TARGET =================
 
     if "income" in df.columns:
         y_true = df["income"].apply(lambda x: 1 if x=='>50K' else 0)
@@ -47,7 +49,7 @@ if uploaded_file is not None:
     else:
         y_true = None
 
-    # ================= ONE HOT ENCODING =================
+    # ================= ENCODING =================
 
     df_encoded = pd.get_dummies(df)
 
@@ -63,28 +65,27 @@ if uploaded_file is not None:
 
     X = scaler.transform(df_encoded)
 
-    # ================= MODEL DROPDOWN =================
+    # ================= MODEL SELECTION =================
 
-    model_name = st.selectbox(
-        "Choose a Model",
-        list(models.keys())
-    )
+    st.markdown("---")
+    model_name = st.selectbox("Select Model", list(models.keys()))
 
     model = models[model_name]
     preds = model.predict(X)
 
+    # ================= PREDICTIONS =================
+
+    st.markdown("---")
     st.subheader("Predictions")
 
     pred_df = pd.DataFrame()
     pred_df["Predicted Income Class"] = preds
 
-    st.write(pred_df.head(10))
+    st.dataframe(pred_df.head(10), use_container_width=True)
 
     # ================= METRICS =================
 
     if y_true is not None:
-
-        st.subheader("Evaluation Metrics")
 
         acc = accuracy_score(y_true, preds)
         prec = precision_score(y_true, preds)
@@ -92,38 +93,56 @@ if uploaded_file is not None:
         f1 = f1_score(y_true, preds)
         mcc = matthews_corrcoef(y_true, preds)
 
-        col1, col2, col3 = st.columns(3)
+        st.markdown("---")
+        st.subheader("📈 Model Performance")
+
+        col1, col2, col3, col4, col5 = st.columns(5)
 
         col1.metric("Accuracy", round(acc,3))
         col2.metric("Precision", round(prec,3))
         col3.metric("Recall", round(rec,3))
-
-        col1.metric("F1 Score", round(f1,3))
-        col2.metric("MCC", round(mcc,3))
+        col4.metric("F1 Score", round(f1,3))
+        col5.metric("MCC", round(mcc,3))
 
         # ================= CONFUSION MATRIX =================
 
-        st.subheader("Confusion Matrix Plot")
+        st.markdown("---")
+        st.subheader("🧩 Confusion Matrix")
 
         cm = confusion_matrix(y_true, preds)
 
-        fig, ax = plt.subplots()
-        sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', ax=ax)
+        fig, ax = plt.subplots(figsize=(4,3))
+        sns.heatmap(cm, annot=True, fmt='d', cmap='coolwarm',
+                    xticklabels=['<=50K','>50K'],
+                    yticklabels=['<=50K','>50K'],
+                    ax=ax)
+
         plt.xlabel("Predicted")
         plt.ylabel("Actual")
+
         st.pyplot(fig)
 
         # ================= CLASSIFICATION REPORT =================
 
-        st.subheader("Classification Report")
-        st.text(classification_report(y_true, preds))
+        st.markdown("---")
+        st.subheader("📊 Classification Report")
+
+        report = classification_report(y_true, preds, output_dict=True)
+        report_df = pd.DataFrame(report).transpose()
+
+        st.dataframe(
+            report_df.style.background_gradient(cmap='Blues'),
+            use_container_width=True
+        )
 
     # ================= DOWNLOAD =================
+
+    st.markdown("---")
 
     csv = pred_df.to_csv(index=False).encode('utf-8')
 
     st.download_button(
-        "Download Predictions CSV",
+        "⬇ Download Predictions CSV",
         csv,
         "predictions.csv",
         "text/csv"
