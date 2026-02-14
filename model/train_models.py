@@ -1,62 +1,55 @@
 import pandas as pd
+import pickle
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
-from sklearn.metrics import accuracy_score, roc_auc_score, precision_score, recall_score, f1_score, matthews_corrcoef
-from sklearn.linear_model import LogisticRegression
-from sklearn.tree import DecisionTreeClassifier
-from sklearn.neighbors import KNeighborsClassifier
-from sklearn.naive_bayes import GaussianNB
 from sklearn.ensemble import RandomForestClassifier
+from sklearn.tree import DecisionTreeClassifier
 from xgboost import XGBClassifier
-import pickle
+from sklearn.metrics import accuracy_score
+import os
 
-df = pd.read_csv("model/data.csv")
-df.columns = df.columns.str.strip()
+df = pd.read_csv("adult.csv")
 
-X = df.drop(df.columns[-1], axis=1)
-y = df[df.columns[-1]]
+df.replace(' ?', pd.NA, inplace=True)
+df.replace('?', pd.NA, inplace=True)
+df.fillna('Unknown', inplace=True)
 
-y = y.str.strip()
-y = y.map({'<=50K':0,'>50K':1})
+df['income'] = df['income'].map({'<=50K':0, '>50K':1})
 
-X_train, X_test, y_train, y_test = train_test_split(X,y,test_size=0.2,random_state=42)
+X = df.drop('income', axis=1)
+y = df['income']
 
-X_train = pd.get_dummies(X_train)
-X_test = pd.get_dummies(X_test)
+# 🔥 ONE HOT ENCODE HERE
+X = pd.get_dummies(X)
 
-X_train, X_test = X_train.align(X_test, join='left', axis=1, fill_value=0)
+# 🔥 SAVE COLUMN NAMES
+columns = X.columns
+
+X_train,X_test,y_train,y_test = train_test_split(X,y,test_size=0.2)
 
 scaler = StandardScaler()
 X_train = scaler.fit_transform(X_train)
 X_test = scaler.transform(X_test)
 
+rf = RandomForestClassifier()
+dt = DecisionTreeClassifier()
+xgb = XGBClassifier(use_label_encoder=False, eval_metric='logloss')
+
+rf.fit(X_train,y_train)
+dt.fit(X_train,y_train)
+xgb.fit(X_train,y_train)
+
 models = {
-"Logistic Regression":LogisticRegression(),
-"Decision Tree":DecisionTreeClassifier(),
-"KNN":KNeighborsClassifier(),
-"Naive Bayes":GaussianNB(),
-"Random Forest":RandomForestClassifier(),
-"XGBoost":XGBClassifier(eval_metric='logloss')
+    "Random Forest":rf,
+    "Decision Tree":dt,
+    "XGBoost":xgb
 }
 
-results={}
+if not os.path.exists("model"):
+    os.makedirs("model")
 
-for name,model in models.items():
-    model.fit(X_train,y_train)
-    y_pred=model.predict(X_test)
+pickle.dump(models, open("model/saved_models.pkl","wb"))
+pickle.dump(scaler, open("model/scaler.pkl","wb"))
+pickle.dump(columns, open("model/columns.pkl","wb"))
 
-    results[name]=[
-        accuracy_score(y_test,y_pred),
-        roc_auc_score(y_test,y_pred),
-        precision_score(y_test,y_pred),
-        recall_score(y_test,y_pred),
-        f1_score(y_test,y_pred),
-        matthews_corrcoef(y_test,y_pred)
-    ]
-
-pickle.dump(models, open("model/saved_models.pkl", "wb"))
-pickle.dump(scaler, open("model/scaler.pkl", "wb"))
-pickle.dump(X.columns, open("model/columns.pkl", "wb"))
-
-
-print(results)
+print("Training Done Successfully")
