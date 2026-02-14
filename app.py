@@ -4,16 +4,21 @@ import pickle
 from sklearn.metrics import classification_report, confusion_matrix
 import matplotlib.pyplot as plt
 import seaborn as sns
+import os
 
-# Load Models
+if not os.path.exists("model/saved_models.pkl"):
+
+    import subprocess
+    subprocess.run(["python", "model/train_models.py"])
+
 models = pickle.load(open("model/saved_models.pkl","rb"))
 scaler = pickle.load(open("model/scaler.pkl","rb"))
+
 
 st.set_page_config(page_title="Income Classification App", layout="wide")
 
 st.title("💼 Adult Income Classification using ML Models")
 
-# Sidebar
 st.sidebar.header("Model Selection")
 model_name = st.sidebar.selectbox(
     "Choose a Model",
@@ -49,13 +54,21 @@ if uploaded_file is not None:
     prediction = model.predict(X)
 
     st.subheader("🔮 Predictions")
-    st.write(pd.DataFrame(prediction, columns=["Predicted Income Class"]))
 
-    # Confusion Matrix
+    result_df = pd.DataFrame(prediction, columns=["Predicted Income Class"])
+    st.write(result_df)
+
+    csv = result_df.to_csv(index=False).encode('utf-8')
+
+    st.download_button(
+        label="📥 Download Predictions as CSV",
+        data=csv,
+        file_name='predictions.csv',
+        mime='text/csv'
+    )
+
     if st.checkbox("Show Confusion Matrix"):
-
         y_true = st.number_input("Enter Actual Class (0 or 1)",0,1)
-
         cm = confusion_matrix([y_true]*len(prediction), prediction)
 
         fig, ax = plt.subplots()
@@ -64,13 +77,8 @@ if uploaded_file is not None:
         ax.set_ylabel("Actual")
         st.pyplot(fig)
 
-    # Classification Report
     if st.checkbox("Show Classification Report"):
-
         y_true = st.number_input("Enter Actual Class ",0,1)
-
         report = classification_report([y_true]*len(prediction), prediction, output_dict=True)
-
         report_df = pd.DataFrame(report).transpose()
-
         st.dataframe(report_df)
