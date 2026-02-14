@@ -1,103 +1,69 @@
 import streamlit as st
 import pandas as pd
 import pickle
-from sklearn.metrics import classification_report, confusion_matrix
-import matplotlib.pyplot as plt
-import seaborn as sns
 import os
-import subprocess
 
-# ---------------- AUTO TRAIN MODEL IF NOT PRESENT ---------------- #
+st.set_page_config(page_title="Adult Income Classification", layout="wide")
+
+st.title("💰 Adult Income Prediction using ML Models")
+
+# -------------------- TRAIN MODEL ONLY IF NOT EXISTS --------------------
 
 if not os.path.exists("model/saved_models.pkl"):
-    st.warning("Training models... Please wait for 1-2 minutes ⏳")
+    st.warning("Training models for first time... Please wait 1-2 minutes ⏳")
+    import model.train_models
 
-    subprocess.run(
-        ["python", "model/train_models.py"],
-        cwd="."
-    )
+# -------------------- LOAD MODELS --------------------
 
-# ---------------- LOAD TRAINED MODELS ---------------- #
+models = pickle.load(open("model/saved_models.pkl", "rb"))
+scaler = pickle.load(open("model/scaler.pkl", "rb"))
+columns = pickle.load(open("model/columns.pkl", "rb"))
 
-models = pickle.load(open("model/saved_models.pkl","rb"))
-scaler = pickle.load(open("model/scaler.pkl","rb"))
+# -------------------- UI --------------------
 
-# ---------------- STREAMLIT UI ---------------- #
+uploaded_file = st.file_uploader("Upload CSV File", type=["csv"])
 
-st.set_page_config(page_title="Income Classification App", layout="wide")
+model_name = st.selectbox("Select Model", list(models.keys()))
 
-st.title("💼 Adult Income Classification using ML Models")
-
-st.sidebar.header("Model Selection")
-model_name = st.sidebar.selectbox(
-    "Choose a Model",
-    list(models.keys())
-)
-
-st.sidebar.markdown("### Prediction Meaning")
-st.sidebar.write("0 → Income ≤ 50K")
-st.sidebar.write("1 → Income > 50K")
-
-uploaded_file = st.file_uploader("📂 Upload Test CSV (without income column)")
-
-# ---------------- PREDICTION BLOCK ---------------- #
+# -------------------- PREDICTION --------------------
 
 if uploaded_file is not None:
 
     data = pd.read_csv(uploaded_file)
 
-    st.subheader("Uploaded Dataset Preview")
+    st.subheader("Uploaded Data")
     st.write(data.head())
 
+    # One hot encoding
     data = pd.get_dummies(data)
 
-    model_features = scaler.feature_names_in_
-
-    for col in model_features:
+    # Add missing columns
+    for col in columns:
         if col not in data.columns:
             data[col] = 0
 
-    data = data[model_features]
+    # Keep correct order
+    data = data[columns]
 
+    # Scale
     X = scaler.transform(data)
 
+    # Predict
     model = models[model_name]
-    prediction = model.predict(X)
+    predictions = model.predict(X)
 
-    st.subheader("🔮 Predictions")
+    data["Prediction"] = predictions
 
-    result_df = pd.DataFrame(prediction, columns=["Predicted Income Class"])
-    st.write(result_df)
+    st.subheader("Predictions")
+    st.write(data)
 
-    # -------- DOWNLOAD CSV -------- #
+    # -------------------- DOWNLOAD OPTION --------------------
 
-    csv = result_df.to_csv(index=False).encode('utf-8')
+    csv = data.to_csv(index=False).encode("utf-8")
 
     st.download_button(
-        label="📥 Download Predictions as CSV",
+        label="Download Predictions as CSV",
         data=csv,
-        file_name='predictions.csv',
-        mime='text/csv'
+        file_name="predictions.csv",
+        mime="text/csv",
     )
-
-    # -------- CONFUSION MATRIX -------- #
-
-    if st.checkbox("Show Confusion Matrix"):
-
-        y_true = st.number_input("Enter Actual Class (0 or 1)",0,1)
-        cm = confusion_matrix([y_true]*len(prediction), prediction)
-
-        fig, ax = plt.subplots()
-        sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', ax=ax)
-        ax.set_xlabel("Predicted")
-        ax.set_ylabel("Actual")
-        st.pyplot(fig)
-
-    # -------- CLASSIFICATION REPORT -------- #
-
-    if st.checkbox("Show Classification Report"):
-
-        y_true = st.number_input("Enter Actual Class ",0,1)
-        report = classification_report([y_true]*len(prediction), prediction, output_dict=True)
-        report_df = pd.DataFrame(report).transpose()
-        st.dataframe(report_df)
