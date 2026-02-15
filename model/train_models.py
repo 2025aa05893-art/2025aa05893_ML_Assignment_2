@@ -21,10 +21,10 @@ df.dropna(inplace=True)
 y = df['income']
 X = df.drop('income', axis=1)
 
-# convert target
-y = y.apply(lambda x: 1 if x == '>50K' else 0)
+# ⭐ IMPORTANT FIX
+y = y.apply(lambda x: 1 if '>50K' in str(x) else 0)
 
-# ---------------- ONE HOT ENCODING ---------------- #
+# ---------------- ENCODING ---------------- #
 
 X = pd.get_dummies(X)
 
