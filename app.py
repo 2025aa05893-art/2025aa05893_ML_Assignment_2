@@ -29,7 +29,7 @@ if uploaded_file:
     st.write(data.head())
 
     if 'income' in data.columns:
-        # ⭐ IMPORTANT FIX
+
         y_true = data['income'].apply(lambda x: 1 if '>50K' in str(x) else 0)
         data = data.drop('income', axis=1)
     else:
