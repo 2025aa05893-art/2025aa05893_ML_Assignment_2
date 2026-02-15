@@ -21,7 +21,7 @@ df.dropna(inplace=True)
 y = df['income']
 X = df.drop('income', axis=1)
 
-# ⭐ IMPORTANT FIX
+
 y = y.apply(lambda x: 1 if '>50K' in str(x) else 0)
 
 # ---------------- ENCODING ---------------- #
@@ -56,7 +56,6 @@ for name, model in models.items():
 pickle.dump(models, open("saved_models.pkl", "wb"))
 pickle.dump(scaler, open("scaler.pkl", "wb"))
 
-# ⭐ VERY IMPORTANT FOR STREAMLIT
 pickle.dump(X_train.columns.tolist(), open("feature_columns.pkl", "wb"))
 
 print("All models and preprocessing files saved successfully!")
