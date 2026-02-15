@@ -1,8 +1,6 @@
 import streamlit as st
 import pandas as pd
 import pickle
-import os
-import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 
@@ -13,14 +11,7 @@ st.set_page_config(page_title="Adult Income Prediction", layout="wide")
 
 st.title("💰 Adult Income Prediction using ML Models")
 
-# ================= TRAIN MODEL IF NOT EXISTS =================
-
-if not os.path.exists("model/saved_models.pkl"):
-    st.warning("Training models for first time... Please wait ⏳")
-    import model.train_models
-    st.success("Training Completed ✅")
-
-# ================= LOAD MODELS =================
+# ================= LOAD MODELS DIRECTLY =================
 
 models = pickle.load(open("model/saved_models.pkl","rb"))
 scaler = pickle.load(open("model/scaler.pkl","rb"))
@@ -65,7 +56,7 @@ if uploaded_file is not None:
 
     X = scaler.transform(df_encoded)
 
-    # ================= MODEL SELECTION =================
+    # ================= MODEL DROPDOWN =================
 
     st.markdown("---")
     model_name = st.selectbox("Select Model", list(models.keys()))
@@ -114,36 +105,4 @@ if uploaded_file is not None:
         fig, ax = plt.subplots(figsize=(4,3))
         sns.heatmap(cm, annot=True, fmt='d', cmap='coolwarm',
                     xticklabels=['<=50K','>50K'],
-                    yticklabels=['<=50K','>50K'],
-                    ax=ax)
-
-        plt.xlabel("Predicted")
-        plt.ylabel("Actual")
-
-        st.pyplot(fig)
-
-        # ================= CLASSIFICATION REPORT =================
-
-        st.markdown("---")
-        st.subheader("📊 Classification Report")
-
-        report = classification_report(y_true, preds, output_dict=True)
-        report_df = pd.DataFrame(report).transpose()
-
-        st.dataframe(
-            report_df.style.background_gradient(cmap='Blues'),
-            use_container_width=True
-        )
-
-    # ================= DOWNLOAD =================
-
-    st.markdown("---")
-
-    csv = pred_df.to_csv(index=False).encode('utf-8')
-
-    st.download_button(
-        "⬇ Download Predictions CSV",
-        csv,
-        "predictions.csv",
-        "text/csv"
-    )
+                    yticklabels=
