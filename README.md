@@ -1,151 +1,101 @@
-# 🧠 Machine Learning Assignment 2
+# Machine Learning Assignment 2
 
-## 💰 Adult Income Classification using Multiple ML Models
+## a. Problem Statement
 
----
+The objective of this assignment is to build and evaluate multiple Machine Learning classification models to predict whether an individual's income exceeds $50K per year based on demographic and employment-related attributes from the Adult Income Dataset.
 
-## 📌 Problem Statement
 
-The objective of this project is to build a Machine Learning classification system that predicts whether an individual earns:
+## b. Dataset Description
 
-* **<=50K**
-* **>50K**
+The dataset used for this assignment is the **Adult Income Dataset** obtained from the UCI Machine Learning Repository.
 
-based on demographic and employment-related attributes from the Adult Income Dataset.
+This dataset contains demographic and employment information such as:
 
----
+- Age
+- Workclass
+- Education
+- Marital Status
+- Occupation
+- Relationship
+- Race
+- Gender
+- Capital Gain
+- Capital Loss
+- Hours per Week
+- Native Country
 
-## 📂 Dataset Used
+### Target Variable:
+Income
 
-Adult Income Dataset from the UCI Machine Learning Repository.
+- <=50K
+- >50K
 
-This dataset contains features such as:
-
-* Age
-* Workclass
-* Education
-* Marital Status
-* Occupation
-* Relationship
-* Race
-* Gender
-* Hours-per-week
-* Native Country
-
-These features are used to predict the income class of an individual.
+This is a binary classification problem where the goal is to predict whether an individual's income is above or below $50K annually.
 
 ---
 
-## ⚙️ Machine Learning Models Implemented
+## c. Models Used
 
-The following classification algorithms were implemented:
+Six Machine Learning classification models were implemented and evaluated using the following performance metrics:
 
-* Logistic Regression
-* Decision Tree
-* K-Nearest Neighbors (KNN)
-* Naive Bayes
-* Random Forest
-* XGBoost
-
----
-
-## 📊 Evaluation Metrics Used
-
-To evaluate model performance, the following metrics were used:
-
-* Accuracy
-* Precision
-* Recall
-* F1 Score
-* Matthews Correlation Coefficient (MCC)
-* Confusion Matrix
-* Classification Report
+- Accuracy
+- AUC Score
+- Precision
+- Recall
+- F1 Score
+- Matthews Correlation Coefficient (MCC)
 
 ---
 
-## 🚀 Streamlit Web Application Features
+### Model Comparison Table
 
-The deployed Streamlit application includes:
-
-✔ CSV Dataset Upload Option (Test Data Only)
-✔ Model Selection Dropdown
-✔ Evaluation Metrics Display
-✔ Confusion Matrix Visualization
-✔ Classification Report
-✔ Predictions Table
-✔ Download Predictions as CSV Option
-
----
-
-## ❗ Important Note Regarding Model Files (.pkl)
-
-The trained model files such as:
-
-* `saved_models.pkl`
-* `scaler.pkl`
-
-are **NOT uploaded to GitHub** due to the file size limitations of the Streamlit Free Tier and GitHub.
-
-Instead:
-
-✔ The Streamlit application automatically trains the models during the **first deployment** in the cloud environment.
-✔ The trained `.pkl` files are then generated dynamically within the Streamlit Cloud runtime environment.
-✔ These files are reused in subsequent runs for prediction.
-
-This approach ensures:
-
-* Successful deployment on Streamlit Cloud
-* Compliance with GitHub file size limits
-* Smooth functioning of the application
+| ML Model | Accuracy | AUC | Precision | Recall | F1 Score | MCC |
+|----------|----------|-----|-----------|--------|----------|-----|
+| Logistic Regression | 0.85 | 0.91 | 0.84 | 0.85 | 0.84 | 0.55 |
+| Decision Tree | 0.81 | 0.83 | 0.81 | 0.81 | 0.80 | 0.47 |
+| kNN | 0.82 | 0.86 | 0.81 | 0.82 | 0.81 | 0.47 |
+| Naive Bayes | 0.37 | 0.78 | 0.79 | 0.37 | 0.33 | 0.18 |
+| Random Forest (Ensemble) | 0.85 | 0.92 | 0.84 | 0.85 | 0.84 | 0.56 |
+| XGBoost (Ensemble) | 0.87 | 0.94 | 0.86 | 0.87 | 0.86 | 0.62 |
 
 ---
 
-## 🖥️ How to Run the Application Locally
+### Model Performance Observations
 
-### Step 1: Install Dependencies
-
-```bash
-pip install -r requirements.txt
-```
-
-### Step 2: Run Streamlit App
-
-```bash
-streamlit run app.py
-```
+| ML Model | Observation about model performance |
+|----------|-------------------------------------|
+| Logistic Regression | Provided good performance for binary classification with balanced precision and recall values. |
+| Decision Tree | Simple and interpretable model but slightly lower performance due to overfitting tendencies. |
+| kNN | Showed moderate performance but sensitive to feature scaling and noisy data. |
+| Naive Bayes | Performed poorly due to independence assumption among features. |
+| Random Forest (Ensemble) | Performed better than individual models by reducing variance through ensemble learning. |
+| XGBoost (Ensemble) | Achieved the best performance with highest accuracy and MCC score due to gradient boosting technique. |
 
 ---
 
-## 📁 Project Structure
+## Streamlit Application Deployment
 
-```
-2025aa05893_ML_Assignment_2
-│
-├── model
-│   └── train_models.py
-│
-├── app.py
-├── requirements.txt
-├── runtime.txt
-└── README.md
-```
+A Streamlit Web Application has been developed to deploy the trained models with the following features:
 
----
+- Dataset Upload Option (CSV)
+- Model Selection Dropdown
+- Display of Evaluation Metrics
+- Confusion Matrix Visualization
+- Classification Report
+- Download Predictions as CSV
 
-## 🌐 Deployment
 
-The Streamlit application is deployed using Streamlit Cloud.
+### Streamlit App Link
+https://2025aa05893mlassignment2-jsvyezsxgisy8gpf2jzuvk.streamlit.app/
 
-🔗 Streamlit App Link:
-https://2025aa05893mlassignment2-jqokmz27sn5afuwruvrd8c.streamlit.app/
-
-🔗 GitHub Repository Link:
+### GitHub Repository Link
 https://github.com/2025aa05893-art/2025aa05893_ML_Assignment_2
 
+
+
+## Conclusion
+
+Among all implemented models, **Random Forest** and **XGBoost** provided the best classification performance for predicting income levels in the Adult Income dataset due to their ensemble learning capabilities.
+
 ---
 
-## 📌 Conclusion
-
-Among all the implemented models, **Random Forest** and **XGBoost** provided the best performance for predicting income levels in the Adult Income dataset.
-
----
