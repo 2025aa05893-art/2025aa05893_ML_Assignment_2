@@ -19,6 +19,17 @@ st.set_page_config(page_title="Adult Income Prediction", layout="wide")
 
 st.title("💰 Adult Income Prediction using ML Models")
 
+# ⭐ DOWNLOAD SAMPLE DATASET
+with open("model/data.csv", "rb") as file:
+    st.download_button(
+        label="⬇ Download Sample Dataset (data.csv)",
+        data=file,
+        file_name="data.csv",
+        mime="text/csv"
+    )
+
+# ---------------- FILE UPLOAD ---------------- #
+
 uploaded_file = st.file_uploader("Upload CSV File", type=["csv"])
 
 if uploaded_file:
@@ -51,7 +62,7 @@ if uploaded_file:
     model_choice = st.selectbox("Select Model", list(models.keys()))
     model = models[model_choice]
 
-    # ⭐ AUTO PREDICTION (NO BUTTON)
+    # ⭐ AUTO PREDICTION
     preds = model.predict(X)
 
     st.subheader("Predictions")
@@ -89,7 +100,7 @@ if uploaded_file:
     else:
         st.warning("Upload CSV WITH income column to view metrics.")
 
-    # ---------------- DOWNLOAD ---------------- #
+    # ---------------- DOWNLOAD PREDICTIONS ---------------- #
 
     result_df = pd.DataFrame(preds, columns=["Prediction"])
 
