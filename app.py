@@ -47,10 +47,8 @@ if uploaded_file:
 
     model_choice = st.selectbox("Select Model", list(models.keys()))
 
-    if st.button("Predict"):
-
-        model = models[model_choice]
-        preds = model.predict(X)
+    model = models[model_choice]
+    preds = model.predict(X)
 
         st.subheader("Predictions")
         st.write(preds)
