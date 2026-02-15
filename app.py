@@ -98,11 +98,23 @@ if uploaded_file is not None:
         # ================= CONFUSION MATRIX =================
 
         st.markdown("---")
-        st.subheader("🧩 Confusion Matrix")
+st.subheader("🧩 Confusion Matrix")
 
-        cm = confusion_matrix(y_true, preds)
+cm = confusion_matrix(y_true, preds)
 
-        fig, ax = plt.subplots(figsize=(4,3))
-        sns.heatmap(cm, annot=True, fmt='d', cmap='coolwarm',
-                    xticklabels=['<=50K','>50K'],
-                    yticklabels=
+fig, ax = plt.subplots(figsize=(4,3))
+
+sns.heatmap(
+    cm,
+    annot=True,
+    fmt='d',
+    cmap='coolwarm',
+    xticklabels=['<=50K','>50K'],
+    yticklabels=['<=50K','>50K'],
+    ax=ax
+)
+
+plt.xlabel("Predicted")
+plt.ylabel("Actual")
+
+st.pyplot(fig)
